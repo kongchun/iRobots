@@ -1,20 +1,41 @@
 var Helper = {
+	arrayToMatrix: function(arr, limit) {
+		var max = arr.length;
+
+		if (limit == 0 || limit > max) {
+			limit = max;
+		}
+		var stepSize = Math.ceil(max / limit);
+		var list = [];
+		var count = 0;
+		for (let i = 0; i < stepSize; i++) {
+			var arrItem = [];
+			for (let j = 0; j < limit; j++) {
+				if (count < max) {
+					arrItem.push(arr[count++])
+				}
+			}
+			list.push(arrItem);
+		}
+		return list;
+	},
 	iteratorArr: function(arr, promiseCallback) {
 		var it = arr[Symbol.iterator]();
 		var list = [];
-		return (function iterator(item) {
+
+		return x(it.next());
+
+		function x(item) {
 			if (item.done) {
 				return Promise.resolve(list);
 			}
-			return promiseCallback(item.value).then((value) => {
+			return promiseCallback(item.value).then(function(value) {
 				return list.push(value);
-			}).then(() => {
-
-				return iterator(it.next());
+			}).then(function() {
+				return x(it.next());
 			}).catch(Promise.reject)
-		})(it.next())
+		}
 	},
-
 	iteratorArrAsync: function(arr, promiseCallback) {
 		var promises = arr.map(promiseCallback);
 		return Promise.all(promises)
@@ -23,10 +44,3 @@ var Helper = {
 
 
 module.exports = Helper;
-
-
-Helper.iteratorArrAsync([1, 2, 3], function(i) {
-	return Promise.resolve(++i);
-}).then(function(arr) {
-	console.log(arr);
-})
