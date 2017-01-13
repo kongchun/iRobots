@@ -1,8 +1,8 @@
 var loader = require('./loader.js');
 
-function loadPlaceAPI(name, city) {
+function loadPlaceAPI(name, city, page_num = 0) {
 	function getPlaceUrl(name, city) {
-		return `http://api.map.baidu.com/place/v2/search?q=${name}&region=${city}&output=json&ak=8hr2ZB5zsFI6dcId9Uj6ORy2kuLIP8vA`
+		return `http://api.map.baidu.com/place/v2/search?q=${name}&region=${city}&&page_size=20&page_num=${page_num}&output=json&ak=8hr2ZB5zsFI6dcId9Uj6ORy2kuLIP8vA`
 	}
 	var url = encodeURI(getPlaceUrl(name, city));
 	return loader.getJSON((url)).then(function(data) {
