@@ -87,12 +87,13 @@ var post = function(url, postBody, options) {
 }
 var postDOM = function(url, postBody, options) {
 	return post(url,postBody, options).then(function(html) {
-		var dom = cheerio.load(html, {
+		var dom = cheerio.load(html, { 
 			withDomLvl1: true,
 			normalizeWhitespace: true,
 			xmlMode: false,
 			decodeEntities: false
 		});
+		
 		return dom;
 	})
 }
