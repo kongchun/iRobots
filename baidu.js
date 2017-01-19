@@ -12,6 +12,18 @@ function loadPlaceAPI(name, city, page_num = 0) {
 	})
 }
 
+function loadSuggestionAPI(name, city) {
+	function getUrl(name, city) {
+		return `http://api.map.baidu.com/place/v2/suggestion?query=${name}&region=${city}&city_limit=true&output=json&ak=8hr2ZB5zsFI6dcId9Uj6ORy2kuLIP8vA`
+	}
+	var url = encodeURI(getUrl(name, city));
+	return loader.getJSON((url)).then(function(data) {
+		return data;
+	}).catch(function(e) {
+		console.log(e);
+	})
+}
+
 function loadGeocoderAPI(name, city) {
 	function getUrl(name, city) {
 		return `http://api.map.baidu.com/geocoder/v2/?output=json&address=${name}&city=${city}&ak=8hr2ZB5zsFI6dcId9Uj6ORy2kuLIP8vA`
@@ -43,5 +55,6 @@ function loadGeocoderGPSAPI(points) {
 module.exports = {
 	loadPlaceAPI: loadPlaceAPI,
 	loadGeocoderAPI: loadGeocoderAPI,
-	loadGeocoderGPSAPI: loadGeocoderGPSAPI
+	loadGeocoderGPSAPI: loadGeocoderGPSAPI,
+	loadSuggestionAPI: loadSuggestionAPI
 };

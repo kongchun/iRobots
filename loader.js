@@ -94,13 +94,23 @@ var postJSON = function(url, postBody, options) {
 	})
 }
 
+var parseHTML = function(html) {
+	var dom = cheerio.load(html, {
+		withDomLvl1: true,
+		normalizeWhitespace: true,
+		xmlMode: false,
+		decodeEntities: false
+	});
+	return dom;
+}
 
 var Loader = {
 	get: get,
 	getJSON: getJSON,
 	getDOM: getDOM,
 	post: post,
-	postJSON: postJSON
+	postJSON: postJSON,
+	parseHTML: parseHTML
 }
 
 module.exports = Loader;
