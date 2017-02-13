@@ -112,7 +112,8 @@ var Loader = {
 	getDOM: getDOM,
 	post: post,
 	postJSON: postJSON,
-	postDOM:postDOM
+	postDOM:postDOM,
+                parseHTML: parseHTML
 }
 
 module.exports = Loader;
