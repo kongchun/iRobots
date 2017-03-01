@@ -97,7 +97,18 @@ var post = function(url, postBody, options) {
 		});
 	})
 }
-
+var postDOM = function(url, postBody, options) {
+	return post(url,postBody, options).then(function(html) {
+		var dom = cheerio.load(html, { 
+			withDomLvl1: true,
+			normalizeWhitespace: true,
+			xmlMode: false,
+			decodeEntities: false
+		});
+		
+		return dom;
+	})
+}
 
 var postJSON = function(url, postBody, options) {
 	return post(url, postBody, options).then(function(content) {
@@ -106,15 +117,6 @@ var postJSON = function(url, postBody, options) {
 	})
 }
 
-var parseHTML = function(html) {
-	var dom = cheerio.load(html, {
-		withDomLvl1: true,
-		normalizeWhitespace: true,
-		xmlMode: false,
-		decodeEntities: false
-	});
-	return dom;
-}
 
 var Loader = {
 	get: get,
@@ -122,7 +124,8 @@ var Loader = {
 	getDOM: getDOM,
 	post: post,
 	postJSON: postJSON,
-	parseHTML: parseHTML
+	postDOM:postDOM,
+                parseHTML: parseHTML
 }
 
 module.exports = Loader;
