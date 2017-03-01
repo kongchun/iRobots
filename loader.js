@@ -25,19 +25,19 @@ var get = function(url, options, callback) {
 			headers: header
 		};
 		request(options, function(error, response, body) {
-			var arr = body.toString().match(/<meta([^>]*?)>/g);
-			if (arr) {
-				arr.forEach(function(val) {
-					var match = val.match(/charsets*=s*(.+)"/);
-					if (match && match[1]) {
-						if (match[1].substr(0, 1) == '"') match[1] = match[1].substr(1);
-						charset = match[1].trim();
-						return false;
-					}
-				})
-			}
-			//console.log(charset, "charset")
 			if (!error && response.statusCode == 200) {
+				var arr = body.toString().match(/<meta([^>]*?)>/g);
+				if (arr) {
+					arr.forEach(function(val) {
+						var match = val.match(/charsets*=s*(.+)"/);
+						if (match && match[1]) {
+							if (match[1].substr(0, 1) == '"') match[1] = match[1].substr(1);
+							charset = match[1].trim();
+							return false;
+						}
+					})
+				}
+				//console.log(charset, "charset")
 				var content = iconv.decode(body, charset);
 				resolve(content);
 			} else {
@@ -49,13 +49,7 @@ var get = function(url, options, callback) {
 
 var getDOM = function(url, options) {
 	return get(url, options).then(function(html) {
-		var dom = cheerio.load(html, {
-			withDomLvl1: true,
-			normalizeWhitespace: true,
-			xmlMode: false,
-			decodeEntities: false
-		});
-		return dom;
+		return parseHTML(html);
 	})
 }
 
@@ -98,15 +92,9 @@ var post = function(url, postBody, options) {
 	})
 }
 var postDOM = function(url, postBody, options) {
-	return post(url,postBody, options).then(function(html) {
-		var dom = cheerio.load(html, { 
-			withDomLvl1: true,
-			normalizeWhitespace: true,
-			xmlMode: false,
-			decodeEntities: false
-		});
-		
-		return dom;
+	return post(url, postBody, options).then(function(html) {
+
+		return parseHTML(html);
 	})
 }
 
@@ -117,6 +105,17 @@ var postJSON = function(url, postBody, options) {
 	})
 }
 
+var parseHTML = function(html) {
+	var dom = cheerio.load(html, {
+		withDomLvl1: true,
+		normalizeWhitespace: true,
+		xmlMode: false,
+		decodeEntities: false
+	});
+
+	return dom;
+}
+
 
 var Loader = {
 	get: get,
@@ -124,8 +123,8 @@ var Loader = {
 	getDOM: getDOM,
 	post: post,
 	postJSON: postJSON,
-	postDOM:postDOM,
-                parseHTML: parseHTML
+	postDOM: postDOM,
+	parseHTML: parseHTML
 }
 
 module.exports = Loader;
