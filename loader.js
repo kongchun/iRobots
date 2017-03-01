@@ -25,6 +25,18 @@ var get = function(url, options, callback) {
 			headers: header
 		};
 		request(options, function(error, response, body) {
+			var arr = body.toString().match(/<meta([^>]*?)>/g);
+			if (arr) {
+				arr.forEach(function(val) {
+					var match = val.match(/charsets*=s*(.+)"/);
+					if (match && match[1]) {
+						if (match[1].substr(0, 1) == '"') match[1] = match[1].substr(1);
+						charset = match[1].trim();
+						return false;
+					}
+				})
+			}
+			//console.log(charset, "charset")
 			if (!error && response.statusCode == 200) {
 				var content = iconv.decode(body, charset);
 				resolve(content);
