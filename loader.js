@@ -3,48 +3,95 @@ var cheerio = require('cheerio');
 var iconv = require('iconv-lite');
 var BufferHelper = require('bufferhelper');
 var request = require('request');
+const UserAgent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.104 Safari/537.36 Core/1.53.2372.400 QQBrowser/9.5.10548.400";
 
-var get = function(url, options, callback) {
-	if (typeof options == 'function') {
-		callback = options;
-		options = {};
-	}
-	options = options || {};
-
+var requestGet = function(url, options = {}) {
 	var {
-		charset = "UTF8",
-			header = {
-				'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.1750.117 Safari/537.36'
-			}
+		header,
+		charset,
+		delay
 	} = options;
+	return requestBody({
+		url: url,
+		header: header,
+		method: "GET",
+		charset: charset,
+		delay: delay
+	});
+};
 
+var requestPost = function(url, postBody, options) {
+	var {
+		header,
+		charset,
+		delay
+	} = options;
+	return requestBody({
+		url: url,
+		method: "POST",
+		charset: charset,
+		formData: postBody,
+		delay: delay
+	})
+};
+
+var requestBody = function({
+	url,
+	method,
+	header = {
+		'User-Agent': UserAgent
+	},
+	formData = {},
+	charset = null,
+	delay = 0
+}) {
+	let options = {
+		method: method,
+		url: url,
+		encoding: null,
+		headers: header,
+		formData: formData
+	}
 	return new Promise(function(resolve, reject) {
-		let options = {
-			url: url,
-			encoding: null,
-			headers: header
-		};
 		request(options, function(error, response, body) {
 			if (!error && response.statusCode == 200) {
-				var arr = body.toString().match(/<meta([^>]*?)>/g);
-				if (arr) {
-					arr.forEach(function(val) {
-						var match = val.match(/charsets*=s*(.+)"/);
-						if (match && match[1]) {
-							if (match[1].substr(0, 1) == '"') match[1] = match[1].substr(1);
-							charset = match[1].trim();
-							return false;
-						}
-					})
+				if (charset == null) {
+					charset = getCharset(body);
 				}
-				//console.log(charset, "charset")
+
 				var content = iconv.decode(body, charset);
-				resolve(content);
+				setTimeout(function() {
+					resolve(content)
+				}, delay);
 			} else {
 				reject(error);
 			}
 		});
 	})
+}
+
+
+
+var getCharset = function(body) {
+	var charset = ""
+	var arr = body.toString().match(/<meta([^>]*?)>/g);
+	if (arr) {
+		arr.forEach(function(val) {
+			var match = val.match(/charsets*=s*(.+)"/);
+			if (match && match[1]) {
+				if (match[1].substr(0, 1) == '"') match[1] = match[1].substr(1);
+				charset = match[1].trim();
+				return false;
+			}
+		})
+	}
+	return charset;
+}
+
+
+
+var get = function(url, options) {
+	return requestGet(url, options);
 }
 
 var getDOM = function(url, options) {
@@ -61,39 +108,10 @@ var getJSON = function(url, options) {
 }
 
 var post = function(url, postBody, options) {
-	if (typeof options == 'function') {
-		options = {};
-	}
-	options = options || {};
-
-	var {
-		charset = "UTF8",
-			header = {
-				'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.1750.117 Safari/537.36'
-			}
-	} = options;
-
-	return new Promise(function(resolve, reject) {
-		let options = {
-			method: "POST",
-			url: url,
-			encoding: null,
-			headers: header,
-			formData: postBody
-		};
-		request(options, function(error, response, body) {
-			if (!error && response.statusCode == 200) {
-				var content = iconv.decode(body, charset);
-				resolve(content);
-			} else {
-				reject(error);
-			}
-		});
-	})
+	return requestPost(url, postBody, options);
 }
 var postDOM = function(url, postBody, options) {
 	return post(url, postBody, options).then(function(html) {
-
 		return parseHTML(html);
 	})
 }
@@ -112,10 +130,8 @@ var parseHTML = function(html) {
 		xmlMode: false,
 		decodeEntities: false
 	});
-
 	return dom;
 }
-
 
 var Loader = {
 	get: get,

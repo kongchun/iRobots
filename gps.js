@@ -1,3 +1,7 @@
+//高德、腾讯、图灵、阿里地图等都是 GCJ-02坐标系
+//GPS WGS-84
+//BAIDU BD-09
+
 var GPS = {
 	PI: 3.14159265358979324,
 	x_pi: 3.14159265358979324 * 3000.0 / 180.0,
@@ -23,7 +27,7 @@ var GPS = {
 		};
 	},
 
-	//WGS-84 to GCJ-02
+	//WGS-84 to GCJ-02 
 	gcj_encrypt: function(wgsLat, wgsLng) {
 		if (this.outOfChina(wgsLat, wgsLng))
 			return {
@@ -192,7 +196,7 @@ var GPS = {
 	// { lat: 31.245753, lng: 121.55974097777778 }
 
 	//根据距离算出坐标（东西南北四个方向的坐标）
-	distanceToPoint: function(latA, lngA, distance) {
+	distanceToDirectionPoint: function(latA, lngA, distance) {
 		var earthR = 6371000.;
 		var alpha = distance / earthR;
 		var s = Math.cos(alpha);
@@ -245,6 +249,16 @@ var GPS = {
 
 	},
 
+	distanceToBoundaryMaxMin: function(latA, lngA, distance) {
+		var op = this.distanceToDirectionPoint(latA, lngA, distance);
+		return {
+			minLat: op.south.lat,
+			maxLat: op.north.lat,
+			minLng: op.west.lng,
+			maxLng: op.east.lng
+		}
+	},
+
 	outOfChina: function(lat, lng) {
 		if (lng < 72.004 || lng > 137.8347)
 			return true;
@@ -268,4 +282,31 @@ var GPS = {
 	}
 };
 
+
+
 module.exports = GPS
+
+
+//console.log(GPS.distanceToDirectionPoint(31.210245, 121.533546, 3000))
+//console.log(GPS.distanceToBoundaryMaxMin(31.210245, 121.533546, 3000))
+
+// 31.237224
+// 31.183265
+// 121.565091
+// 121.502000
+// 
+// 
+// 31.201251
+// 31.219238
+// 121.544061
+// 121.523030
+// 
+// 31.165278
+// 31.255211
+// 121.586121
+// 121.480970
+// 
+// db.brand_sanlin.updateMany({"location.lat": {"$gte" : 31.183265, "$lte" : 31.237224},"location.lng": {"$gte" : 121.502000, "$lte" : 121.565091}},{$set:{
+//     subDistrict:"三林",
+//     distance:3000}
+// })
