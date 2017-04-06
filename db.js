@@ -1,4 +1,5 @@
 var mongodb = require("mongodb");
+var helper = require("./helper.js");
 var MongoClient = mongodb.MongoClient;
 //var url = 'mongodb://127.0.0.1:27017/';
 class DB {
@@ -45,6 +46,19 @@ class DB {
 		})
 	}
 
+	updateById(id, row) {
+		return this.collection.update({
+			_id: this.ObjectId(id)
+		}, {
+			$set: row
+		})
+	}
+
+	findToArray(cond = {}, keys = {}) {
+		return this.collection.find(cond, keys).toArray();
+	}
+
+
 
 	insertUnique(rows, key) {
 
@@ -88,7 +102,20 @@ class DB {
 		})
 	}
 
-
+	updateIterator(fromCond = {}, keyCond = {}, func = function() {
+		return {}
+	}) {
+		return this.findToArray(fromCond, keyCond).then((arr) => {
+			return helper.iteratorArr(arr, (data) => {
+				return this.updateById(data._id, func(data))
+			}).then(function(data) {
+				return data;
+			})
+		}).catch(function(e) {
+			console.log(e)
+			return null;
+		})
+	}
 
 }
 

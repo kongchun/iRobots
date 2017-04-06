@@ -100,7 +100,8 @@ var getDOM = function(url, options) {
 	})
 }
 
-var getJSON = function(url, options) {
+var getJSON = function(url, options = {}) {
+	options.charset = options.charset ? options.charset : "utf-8"
 	return get(url, options).then(function(content) {
 		var json = JSON.parse(content)
 		return json;
@@ -116,7 +117,8 @@ var postDOM = function(url, postBody, options) {
 	})
 }
 
-var postJSON = function(url, postBody, options) {
+var postJSON = function(url, postBody, options = {}) {
+	options.charset = options.charset ? options.charset : "utf-8"
 	return post(url, postBody, options).then(function(content) {
 		var json = JSON.parse(content)
 		return json;
