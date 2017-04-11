@@ -279,6 +279,118 @@ var GPS = {
 		ret += (20.0 * Math.sin(x * this.PI) + 40.0 * Math.sin(x / 3.0 * this.PI)) * 2.0 / 3.0;
 		ret += (150.0 * Math.sin(x / 12.0 * this.PI) + 300.0 * Math.sin(x / 30.0 * this.PI)) * 2.0 / 3.0;
 		return ret;
+	},
+
+	getGrids: function(minLng, minLat, maxLng, maxLat, distance) {
+		var lng = minLng;
+		var lngArr = [lng];
+
+		while (lng <= maxLng) {
+			var pt = this.distanceToDirectionPoint(minLat, lng, distance)
+			var north = pt.north;
+			var east = pt.east;
+			lng = east.lng
+			lngArr.push(lng);
+		}
+
+		var lat = minLat;
+		var latArr = [lat];
+
+		while (lat <= maxLat) {
+			var pt = this.distanceToDirectionPoint(lat, minLng, distance)
+			var north = pt.north;
+			var east = pt.east;
+			lat = north.lat
+			latArr.push(lat);
+		}
+		//console.log(lngArr.length);
+		//console.log(latArr.length);
+
+		var points = [];
+		for (let i = 0; i < lngArr.length - 1; i++) {
+			for (let j = 0; j < latArr.length - 1; j++) {
+				var arr = [];
+				arr.push([lngArr[i], latArr[j]]);
+				arr.push([lngArr[i], latArr[j + 1]]);
+				arr.push([lngArr[i + 1], latArr[j + 1]]);
+				arr.push([lngArr[i + 1], latArr[j]]);
+
+				var center = this.distanceToBoundaryMaxMin(latArr[j], lngArr[i], distance / 2)
+				points.push({
+					center: [center.maxLng, center.maxLat],
+					grids: arr
+				});
+			}
+		}
+		return (points)
+
+	},
+	//Path [{lng,lat}]
+	isPointInPolygon: function(lat, lng, pts) {
+		var N = pts.length;
+		var boundOrVertex = true; //如果点位于多边形的顶点或边上，也算做点在多边形内，直接返回true
+		var intersectCount = 0; //cross points count of x 
+		var precision = 2e-10; //浮点类型计算时候与0比较时候的容差
+		var p1, p2; //neighbour bound vertices
+		var p = {
+			lat: lat,
+			lng: lng
+		}; //测试点
+
+		p1 = pts[0]; //left vertex        
+		for (var i = 1; i <= N; ++i) { //check all rays
+			if (p.lat == p1.lat && p.lng == p1.lng) {
+				//if (p.equals(p1)) {
+				return boundOrVertex; //p is an vertex
+			}
+
+			p2 = pts[i % N]; //right vertex            
+			if (p.lat < Math.min(p1.lat, p2.lat) || p.lat > Math.max(p1.lat, p2.lat)) { //ray is outside of our interests                
+				p1 = p2;
+				continue; //next ray left point
+			}
+
+			if (p.lat > Math.min(p1.lat, p2.lat) && p.lat < Math.max(p1.lat, p2.lat)) { //ray is crossing over by the algorithm (common part of)
+				if (p.lng <= Math.max(p1.lng, p2.lng)) { //x is before of ray                    
+					if (p1.lat == p2.lat && p.lng >= Math.min(p1.lng, p2.lng)) { //overlies on a horizontal ray
+						return boundOrVertex;
+					}
+
+					if (p1.lng == p2.lng) { //ray is vertical                        
+						if (p1.lng == p.lng) { //overlies on a vertical ray
+							return boundOrVertex;
+						} else { //before ray
+							++intersectCount;
+						}
+					} else { //cross point on the left side                        
+						var xinters = (p.lat - p1.lat) * (p2.lng - p1.lng) / (p2.lat - p1.lat) + p1.lng; //cross point of lng                        
+						if (Math.abs(p.lng - xinters) < precision) { //overlies on a ray
+							return boundOrVertex;
+						}
+
+						if (p.lng < xinters) { //before ray
+							++intersectCount;
+						}
+					}
+				}
+			} else { //special case when ray is crossing through the vertex                
+				if (p.lat == p2.lat && p.lng <= p2.lng) { //p crossing over p2                    
+					var p3 = pts[(i + 1) % N]; //next vertex                    
+					if (p.lat >= Math.min(p1.lat, p3.lat) && p.lat <= Math.max(p1.lat, p3.lat)) { //p.lat lies between p1.lat & p3.lat
+						++intersectCount;
+					} else {
+						intersectCount += 2;
+					}
+				}
+			}
+			p1 = p2; //next ray left point
+		}
+
+		if (intersectCount % 2 == 0) { //偶数在多边形外
+			return false;
+		} else { //奇数在多边形内
+			return true;
+		}
 	}
 };
 
