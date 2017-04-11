@@ -325,7 +325,18 @@ var GPS = {
 		return (points)
 
 	},
-	//Path [{lng,lat}]
+
+	isPointInCircle: function(lat, lng, cLat, cLng, cDistance) {
+		var dis = this.distance(lat, lng, cLat, cLng);
+		if (dis <= cDistance) {
+			return true;
+		} else {
+			return false;
+		}
+	},
+
+
+	//pts [{lng,lat}]
 	isPointInPolygon: function(lat, lng, pts) {
 		var N = pts.length;
 		var boundOrVertex = true; //如果点位于多边形的顶点或边上，也算做点在多边形内，直接返回true
