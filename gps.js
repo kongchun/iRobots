@@ -318,6 +318,10 @@ var GPS = {
 				var center = this.distanceToBoundaryMaxMin(latArr[j], lngArr[i], distance / 2)
 				points.push({
 					center: [center.maxLng, center.maxLat],
+					location: {
+						lat: center.maxLat,
+						lng: center.maxLng
+					},
 					grids: arr
 				});
 			}
@@ -433,3 +437,16 @@ module.exports = GPS
 //     subDistrict:"三林",
 //     distance:3000}
 // })
+// 
+// 
+// 徐家汇商圈
+// 121.446977,31.200873
+console.log(getSearhCond(31.200873, 121.446977, 1000))
+
+
+
+function getSearhCond(lat, lng, distance) {
+	var pt = GPS.distanceToBoundaryMaxMin(lat, lng, 1000);
+	var cond = `{"location.lat": {"$gte" : ${pt.minLat}, "$lte" : ${pt.maxLat}},"location.lng": {"$gte" : ${pt.minLng}, "$lte" : ${pt.maxLng}}}`
+	return (cond);
+}
