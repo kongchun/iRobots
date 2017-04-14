@@ -1,4 +1,4 @@
-//高德、腾讯、图灵、阿里地图等都是 GCJ-02坐标系
+//高德、 腾讯、 图灵、 阿里地图等都是 GCJ - 02 坐标系
 //GPS WGS-84
 //BAIDU BD-09
 
@@ -441,12 +441,28 @@ module.exports = GPS
 // 
 // 徐家汇商圈
 // 121.446977,31.200873
-console.log(getSearhCond(31.200873, 121.446977, 1000))
+// console.log(getSearhCond(31.200873, 121.446977, 1000))
 
 
 
-function getSearhCond(lat, lng, distance) {
-	var pt = GPS.distanceToBoundaryMaxMin(lat, lng, 1000);
-	var cond = `{"location.lat": {"$gte" : ${pt.minLat}, "$lte" : ${pt.maxLat}},"location.lng": {"$gte" : ${pt.minLng}, "$lte" : ${pt.maxLng}}}`
-	return (cond);
-}
+// function getSearhCond(lat, lng, distance) {
+// 	var pt = GPS.distanceToBoundaryMaxMin(lat, lng, 1000);
+// 	var cond = `{"location.lat": {"$gte" : ${pt.minLat}, "$lte" : ${pt.maxLat}},"location.lng": {"$gte" : ${pt.minLng}, "$lte" : ${pt.maxLng}}}`
+// 	return (cond);
+// }
+
+// var cond = {}
+// var data = db.grid_500.find(cond)
+// var arr= [];
+// data.forEach((i)=>{
+//     var id=i._id;
+//     i.wgs_84.forEach((j,k)=>{
+//         var n = k+1;
+//         var lat = j.lat;
+//         var lng = j.lng;
+//         arr.push({
+//             id,n,lng,lat
+//         })
+//     })
+// })
+// arr;
