@@ -50,7 +50,7 @@ var requestBody = function({
 		url: url,
 		encoding: null,
 		headers: header,
-		formData: formData
+		form: formData
 	}
 	return new Promise(function(resolve, reject) {
 		request(options, function(error, response, body) {
