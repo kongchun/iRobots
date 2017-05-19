@@ -36,9 +36,9 @@ class DB {
 		if (!Array.isArray(rows)) {
 			rows = [rows]
 		}
-		rows.map((i) => {
-			i["_id"] = (new mongodb.ObjectId().toString())
-		});
+		// rows.map((i) => {
+		// 	i["_id"] = (new mongodb.ObjectId().toString())
+		// });
 		return new Promise((resolve, reject) => {
 			this.collection.insert(rows, {
 				w: 1
@@ -84,12 +84,12 @@ class DB {
 					seachKey = obj;
 				}
 				//console.log(row)
-				this.collection.find(seachKey).toArray().then((t) => {
+				this.collection.findOne(seachKey).then((t) => {
 					//console.log(t.length > 0)
-					if (t.length == 0) {
+					if (!t) {
 						return this.insert(row);
 					} else {
-						console.log(row.url, "is not Unique");
+						console.log(row[key], "is not Unique");
 						return row
 					}
 				}).then(function() {
@@ -106,9 +106,12 @@ class DB {
 		return {}
 	}) {
 		return this.findToArray(fromCond, keyCond).then((arr) => {
+			console.log(arr.length)
 			return helper.iteratorArr(arr, (data) => {
+
 				return this.updateById(data._id, func(data))
 			}).then(function(data) {
+				//console.log(data)
 				return data;
 			})
 		}).catch(function(e) {
