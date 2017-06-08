@@ -3,7 +3,7 @@ var cheerio = require('cheerio');
 var iconv = require('iconv-lite');
 var BufferHelper = require('bufferhelper');
 var request = require('request');
-const UserAgent = "Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.104 Safari/537.36 Core/1.53.2372.400 QQBrowser/9.5.10548.400";
+var userAgent = require('./userAgent.js');
 
 var requestGet = function(url, options = {}) {
 	var {
@@ -35,11 +35,13 @@ var requestPost = function(url, postBody, options) {
 	})
 };
 
+
+
 var requestBody = function({
 	url,
 	method,
 	header = {
-		'User-Agent': UserAgent
+		'User-Agent': userAgent.getRandom()
 	},
 	formData = {},
 	charset = null,
@@ -52,6 +54,7 @@ var requestBody = function({
 		headers: header,
 		form: formData
 	}
+
 	return new Promise(function(resolve, reject) {
 		request(options, function(error, response, body) {
 			if (!error && response.statusCode == 200) {

@@ -94,8 +94,8 @@ var GPS = {
 			y = gcjLat;
 		var z = Math.sqrt(x * x + y * y) + 0.00002 * Math.sin(y * this.x_pi);
 		var theta = Math.atan2(y, x) + 0.000003 * Math.cos(x * this.x_pi);
-		bdLng = z * Math.cos(theta) + 0.0065;
-		bdLat = z * Math.sin(theta) + 0.006;
+		var bdLng = z * Math.cos(theta) + 0.0065;
+		var bdLat = z * Math.sin(theta) + 0.006;
 		return {
 			'lat': bdLat,
 			'lng': bdLng
