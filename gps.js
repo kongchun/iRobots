@@ -28,6 +28,7 @@ var GPS = {
 	},
 
 	//WGS-84 to GCJ-02 
+
 	gcj_encrypt: function(wgsLat, wgsLng) {
 		if (this.outOfChina(wgsLat, wgsLng))
 			return {
@@ -153,6 +154,43 @@ var GPS = {
 		var y = (1.5707963267948966 - (2.0 * Math.atan(Math.exp((-1.0 * mercatorLat) / 6378137.0)))) * 57.295779513082323;
 		return {'lat' : y, 'lng' : x};
 		//*/
+	},
+
+	bdmercator_bd09:function(bdmercatorLng,bdmercatorLat){
+		function K(a, b) {
+		    this.lng = a;
+		    this.lat = b
+		}
+
+		var bd = {
+		    Sp: [1.289059486E7, 8362377.87, 5591021, 3481989.83, 1678043.12, 0],
+		    Au: [[1.410526172116255E-8, 8.98305509648872E-6, -1.9939833816331, 200.9824383106796, -187.2403703815547, 91.6087516669843, -23.38765649603339, 2.57121317296198, -0.03801003308653, 1.73379812E7], [ - 7.435856389565537E-9, 8.983055097726239E-6, -0.78625201886289, 96.32687599759846, -1.85204757529826, -59.36935905485877, 47.40033549296737, -16.50741931063887, 2.28786674699375, 1.026014486E7], [ - 3.030883460898826E-8, 8.98305509983578E-6, 0.30071316287616, 59.74293618442277, 7.357984074871, -25.38371002664745, 13.45380521110908, -3.29883767235584, 0.32710905363475, 6856817.37], [ - 1.981981304930552E-8, 8.983055099779535E-6, 0.03278182852591, 40.31678527705744, 0.65659298677277, -4.44255534477492, 0.85341911805263, 0.12923347998204, -0.04625736007561, 4482777.06], [3.09191371068437E-9, 8.983055096812155E-6, 6.995724062E-5, 23.10934304144901, -2.3663490511E-4, -0.6321817810242, -0.00663494467273, 0.03430082397953, -0.00466043876332, 2555164.4], [2.890871144776878E-9, 8.983055095805407E-6, -3.068298E-8, 7.47137025468032, -3.53937994E-6, -0.02145144861037, -1.234426596E-5, 1.0322952773E-4, -3.23890364E-6, 826088.5]],
+
+			Ra: function(a) {
+			    var b, c;
+			    b = new K(Math.abs(a.lng), Math.abs(a.lat));
+			    for (var d = 0; d < this.Sp.length; d++) if (b.lat >=this.Sp[d]) {
+			        c = this.Au[d];
+			        break
+			    }
+			    a = this.Yr(a, c);
+			    return a = new K(a.lng.toFixed(6), a.lat.toFixed(6))
+			},
+
+			Yr: function(a, b) {
+			    if (a && b) {
+			        var c = b[0] + b[1] * Math.abs(a.lng),
+			        d = Math.abs(a.lat) / b[9],
+			        d = b[2] + b[3] * d + b[4] * d * d + b[5] * d * d * d + b[6] * d * d * d * d + b[7] * d * d * d * d * d + b[8] * d * d * d * d * d * d,
+			        c = c * (0 > a.lng ? -1 : 1),
+			        d = d * (0 > a.lat ? -1 : 1);
+			        return new K(c, d)
+		    }
+			}
+		}
+
+		return bd.Ra({lng:bdmercatorLng,lat:bdmercatorLat})
+
 	},
 	// two point's distance
 	// distance : function (latA, lngA, latB, lngB) {
@@ -414,8 +452,8 @@ var GPS = {
 module.exports = GPS
 
 
-//console.log(GPS.distanceToDirectionPoint(31.210245, 121.533546, 3000))
-//console.log(GPS.distanceToBoundaryMaxMin(31.210245, 121.533546, 3000))
+//console.log(GPS.distanceToDirectionPoint(31.205267, 121.445907, 250))
+//console.log(GPS.distanceToBoundaryMaxMin(31.223233, 121.440631, 250))
 
 // 31.237224
 // 31.183265
@@ -440,16 +478,15 @@ module.exports = GPS
 // 
 // 
 // 徐家汇商圈
-// 121.446977,31.200873
-// console.log(getSearhCond(31.200873, 121.446977, 1000))
+// 121.444701,31.19914
+//console.log(getSearhCond(31.243231, 121.4907, 250))
 
 
-
-// function getSearhCond(lat, lng, distance) {
-// 	var pt = GPS.distanceToBoundaryMaxMin(lat, lng, 1000);
-// 	var cond = `{"location.lat": {"$gte" : ${pt.minLat}, "$lte" : ${pt.maxLat}},"location.lng": {"$gte" : ${pt.minLng}, "$lte" : ${pt.maxLng}}}`
-// 	return (cond);
-// }
+function getSearhCond(lat, lng, distance) {
+	var pt = GPS.distanceToBoundaryMaxMin(lat, lng, distance);
+	var cond = `{"location.lat": {"$gte" : ${pt.minLat}, "$lte" : ${pt.maxLat}},"location.lng": {"$gte" : ${pt.minLng}, "$lte" : ${pt.maxLng}}}`
+	return (cond);
+}
 
 // var cond = {}
 // var data = db.grid_500.find(cond)
@@ -466,3 +503,71 @@ module.exports = GPS
 //     })
 // })
 // arr;
+// 
+// 
+var t = [[	121.445907	,	31.223233	],
+[	121.451183	,	31.223233	],
+[	121.440631	,	31.227725	],
+[	121.445907	,	31.227725	],
+[	121.451183	,	31.227725	],
+[	121.456458	,	31.227725	],
+[	121.461734	,	31.227725	],
+[	121.445907	,	31.232216	],
+[	121.451183	,	31.232216	],
+[	121.456458	,	31.232216	],
+[	121.461734	,	31.232216	],
+[	121.456458	,	31.236708	],
+[	121.461734	,	31.236708	]]
+
+
+// var z = [];
+// t.forEach(function(x){
+
+// 	var gcj = GPS.gcj_encrypt(x[1],x[0]);
+// 	var x =(GPS.bd_encrypt(gcj.lat,gcj.lng))
+// 	var w = [new Number(x.lat.toFixed(6)), new Number(x.lng.toFixed(6))]
+// 	console.log(JSON.stringify(w))
+
+// })
+
+var t = 	[[31.227668,121.456947],
+[31.227668,121.462227],
+[31.232212,121.451672],
+[31.232212,121.456947],
+[31.232212,121.462227],
+[31.232212,121.46751],
+[31.232212,121.472795],
+[31.236655,121.456947],
+[31.236655,121.462227],
+[31.236655,121.46751],
+[31.236655,121.472795],
+[31.240982,121.46751],
+[31.240982,121.472795]
+]
+
+
+// t.forEach(function(x){
+
+
+
+// 	var p = (GPS.distanceToBoundaryMaxMin(x[0], x[1], 250));
+// 	var arr = [];
+// 	arr.push([p.minLng,p.minLat])
+// 	arr.push([p.minLng,p.maxLat])
+// 	arr.push([p.maxLng,p.maxLat])
+// 	arr.push([p.maxLng,p.minLat])
+// 	console.log (JSON.stringify(arr))
+// 	z.push(arr)
+// })
+//console.log(z)
+
+
+
+
+
+//console.log(mercatorTolonlat({x:13518412.3,y:3634456.9}))
+
+
+
+
+console.log(GPS.bdmercator_bd09(13518412.3,3634456.9))

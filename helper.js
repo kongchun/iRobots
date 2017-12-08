@@ -33,7 +33,10 @@ var Helper = {
 				return list.push(value);
 			}).then(function() {
 				return x(it.next());
-			}).catch(Promise.reject)
+			}).catch(function(e){
+				console.log(item,e);
+				return x(it.next());
+			})
 		}
 	},
 	iteratorArrAsync: function(arr, promiseCallback) {

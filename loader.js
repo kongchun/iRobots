@@ -61,7 +61,7 @@ var requestBody = function({
 				if (charset == null) {
 					charset = getCharset(body);
 				}
-
+				//console.log(charset)
 				var content = iconv.decode(body, charset);
 				setTimeout(function() {
 					resolve(content)
