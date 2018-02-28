@@ -541,10 +541,10 @@ var t = [[	121.43008	,	31.182809	],
 //图吧地图：31.2388226600,121.5050979200
 //谷歌地球：31.2417726600,121.4954779200
 
-var df = [31.2417726600,121.4954779200];
-var gcj = GPS.gcj_encrypt (df[0],df[1]);
-var x =(GPS.bd_encrypt(gcj.lat,gcj.lng))
-console.log(gcj)
+// var df = [31.2417726600,121.4954779200];
+// var gcj = GPS.gcj_encrypt (df[0],df[1]);
+// var x =(GPS.bd_encrypt(gcj.lat,gcj.lng))
+// console.log(gcj)
 // var z = [];
 // t.forEach(function(x){
 
