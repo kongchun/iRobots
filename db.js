@@ -3,9 +3,10 @@ var helper = require("./helper.js");
 var MongoClient = mongodb.MongoClient;
 //var url = 'mongodb://127.0.0.1:27017/';
 class DB {
-	constructor(url = "127.0.0.1", dbName = "test") {
-		this.url = `mongodb://${url}:27017/${dbName}`;
+	constructor(url = "127.0.0.1", dbName = "test", port="27017") {
+		this.url = `mongodb://${url}:${port}`;
 		this.db = null;
+		this.dbName = dbName;
 		this.collection = null;
 		this.ObjectId = mongodb.ObjectId;
 	}
@@ -16,10 +17,10 @@ class DB {
 				resolve(this.collection);
 				return;
 			}
-			MongoClient.connect(this.url).then((db) => {
+			MongoClient.connect(this.url).then((client) => {
 				//console.log("openDB")
-				this.db = db;
-				var collection = this.collection = db.collection(table);
+				this.db = client;
+				var collection = this.collection = client.db(this.dbName).collection(table);
 				resolve(this.collection);
 			}).catch(reject);
 		})
@@ -122,8 +123,8 @@ class DB {
 
 }
 
-module.exports = function(url, dbName) {
-	return new DB(url, dbName);
+module.exports = function(url, dbName,port) {
+	return new DB(url, dbName,port);
 }
 
 /*
