@@ -4,9 +4,8 @@ var MongoClient = mongodb.MongoClient;
 //var url = 'mongodb://127.0.0.1:27017/';
 class DB {
 	constructor(url = "127.0.0.1", dbName = "test", port="27017") {
-		this.url = `mongodb://${url}:${port}`;
+		this.url = `mongodb://${url}:${port}/${dbName}`;
 		this.db = null;
-		this.dbName = dbName;
 		this.collection = null;
 		this.ObjectId = mongodb.ObjectId;
 	}
@@ -17,10 +16,10 @@ class DB {
 				resolve(this.collection);
 				return;
 			}
-			MongoClient.connect(this.url).then((client) => {
+			MongoClient.connect(this.url).then((db) => {
 				//console.log("openDB")
-				this.db = client;
-				var collection = this.collection = client.db(this.dbName).collection(table);
+				this.db = db;
+				var collection = this.collection = db.collection(table);
 				resolve(this.collection);
 			}).catch(reject);
 		})
