@@ -106,7 +106,7 @@ class DB {
 		return {}
 	}) {
 		return this.findToArray(fromCond, keyCond).then((arr) => {
-			console.log(arr.length)
+			//console.log(arr.length)
 			return helper.iteratorArr(arr, (data) => {
 
 				return this.updateById(data._id, func(data))
