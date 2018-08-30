@@ -28,6 +28,7 @@ var requestPost = function(url, postBody, options) {
 	} = options;
 	return requestBody({
 		url: url,
+		header:header,
 		method: "POST",
 		charset: charset,
 		formData: postBody,
@@ -55,13 +56,14 @@ var requestBody = function({
 		form: formData
 	}
 
+	//console.log(options);
+
 	return new Promise(function(resolve, reject) {
 		request(options, function(error, response, body) {
 			if (!error && response.statusCode == 200) {
 				if (charset == null) {
 					charset = getCharset(body);
 				}
-				//console.log(charset)
 				var content = iconv.decode(body, charset);
 				setTimeout(function() {
 					resolve(content)
@@ -87,6 +89,9 @@ var getCharset = function(body) {
 				return false;
 			}
 		})
+	}
+	if (charset == "") {
+		charset = "utf-8";
 	}
 	return charset;
 }
