@@ -8,8 +8,10 @@ class DB {
 		this.db = null;
 		this.collection = null;
 		this.ObjectId = mongodb.ObjectId;
+		this.Code = mongodb.Code;
 	}
 	open(table) {
+		this.close();
 		return new Promise((resolve, reject) => {
 			if (this.db && this.db != null) {
 
@@ -125,83 +127,3 @@ class DB {
 module.exports = function(url, dbName,port) {
 	return new DB(url, dbName,port);
 }
-
-/*
-var rows = [{
-	url: "AAAB"
-}, {
-	url: "AAAC"
-}]
-
-var db = new DB;
-var o = {
-	w: 1
-};
-o.multi = true
-
-db.open("url").then(function() {
-	return db.insert(rows);
-}).then(function() {
-	db.close();
-}).catch(function(e) {
-	console.log(e);
-	db.close();
-})
-*/
-/*
-db.open("url").then(function(collection) {
-	collection.find({}).sort({
-		_id: 1
-	})
-
-})
-*/
-// var db = new DB;
-// db.open("articles").then(function(collection) {
-// 	return collection.findOne({})
-
-// }).then(function(json) {
-
-// 	console.log(json.createDate)
-// 	console.log(new Date(json.createDate).toLocaleString())
-// 	console.log(new Date().toLocaleString())
-// 	db.colse()
-// })
-
-/*
-.insert([{
-	url: "E"
-}, {
-	url: "D"
-}]).then(function(t) {
-	console.log(t)
-}).catch(function(e) {
-	console.log(e)
-})
-*/
-
-
-/*
-Page.writer(["A", "B"]).then(function() {
-	return Page.find()
-}).then(function(r) {
-	console.log(r);
-	return //Page.clear()
-}).then(function(r) {
-	return Page.find()
-}).then(function(r) {
-	console.log(r);
-}).catch(function(e) {
-
-	console.log(e);
-})
-*/
-
-
-// var db = new DB;
-// db.open("articles").then(function(collection) {
-// 	return collection.update()
-
-// }).then(function(data) {
-// 	console.log(data)
-// })
