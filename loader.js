@@ -4,8 +4,6 @@ var iconv = require('iconv-lite');
 var BufferHelper = require('bufferhelper');
 var request = require('request');
 var userAgent = require('./userAgent.js');
-//const puppeteer = require('puppeteer');
-//const devices = require('puppeteer/DeviceDescriptors') 
 
 var request = request.defaults({jar: true})
 
@@ -159,39 +157,6 @@ var parseHTML = function(html) {
 	return dom;
 }
 
- async function getCookie(url){
-	 return null;
-	// const browser = await puppeteer.launch({
-	// 	args: [
-    //         '--no-sandbox'
-    //     ],
-	// 	executablePath: 'C:/Users/kongchun/AppData/Local/Google/Chrome/Application/chrome.exe',
-	// 	//ignoreHTTPSErrors: true,
-	// 	devtools: true,
-	// 	headless: false,
-	// 	dumpio: false,
-	// 	isMobile: true 
-	//   });
-	// const page = await browser.newPage();
-	// //await page.emulate(devices['iPhone 8'])
-	// await page.goto(url,{
-	// //	waitUntil: 'networkidle2'
-	// });
-	// //await page.waitFor(1000);
-	// let arr = await page.cookies();
-	// let co = [];
-	// arr.forEach((t)=>{
-	// 	co.push(t.name+"="+t.value)
-	// })
-	// //let cookie = await page.evaluate(() => document.cookie);
-	// let cookie = (co.join(";"))
-	// //console.log("cookie :" + cookie);
-	// //browser.close();
-	// return cookie;
-}
-
-
-
 var Loader = {
 	get: get,
 	getJSON: getJSON,
@@ -201,8 +166,8 @@ var Loader = {
 	postDOM: postDOM,
 	parseHTML: parseHTML,
 	request:request,
-	getCookie:getCookie
 }
+
 
 module.exports = Loader;
 
