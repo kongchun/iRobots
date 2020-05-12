@@ -4,6 +4,10 @@ var iconv = require('iconv-lite');
 var BufferHelper = require('bufferhelper');
 var request = require('request');
 var userAgent = require('./userAgent.js');
+//const puppeteer = require('puppeteer');
+//const devices = require('puppeteer/DeviceDescriptors') 
+
+var request = request.defaults({jar: true})
 
 var requestGet = function(url, options = {}) {
 	var {
@@ -53,18 +57,29 @@ var requestBody = function({
 		url: url,
 		encoding: null,
 		headers: header,
-		form: formData
+		form: formData,
+		//proxy:"http://127.0.0.1:1086"
 	}
 
 	//console.log(options);
 
 	return new Promise(function(resolve, reject) {
+
 		request(options, function(error, response, body) {
-			if (!error && response.statusCode == 200) {
+
+			if (!error && (response.statusCode == 200 || response.statusCode==202) ) {
+				console.log(body.toString())
 				if (charset == null) {
 					charset = getCharset(body);
 				}
-				var content = iconv.decode(body, charset);
+				var  content = null;
+				try{
+					content = iconv.decode(body, charset);
+				}catch(e){
+					content = body.toString();
+				}
+				//console.log(content);
+				
 				setTimeout(function() {
 					resolve(content)
 				}, delay);
@@ -111,6 +126,7 @@ var getDOM = function(url, options) {
 var getJSON = function(url, options = {}) {
 	options.charset = options.charset ? options.charset : "utf-8"
 	return get(url, options).then(function(content) {
+		//console.log(content);
 		var json = JSON.parse(content)
 		return json;
 	})
@@ -143,6 +159,39 @@ var parseHTML = function(html) {
 	return dom;
 }
 
+ async function getCookie(url){
+	 return null;
+	// const browser = await puppeteer.launch({
+	// 	args: [
+    //         '--no-sandbox'
+    //     ],
+	// 	executablePath: 'C:/Users/kongchun/AppData/Local/Google/Chrome/Application/chrome.exe',
+	// 	//ignoreHTTPSErrors: true,
+	// 	devtools: true,
+	// 	headless: false,
+	// 	dumpio: false,
+	// 	isMobile: true 
+	//   });
+	// const page = await browser.newPage();
+	// //await page.emulate(devices['iPhone 8'])
+	// await page.goto(url,{
+	// //	waitUntil: 'networkidle2'
+	// });
+	// //await page.waitFor(1000);
+	// let arr = await page.cookies();
+	// let co = [];
+	// arr.forEach((t)=>{
+	// 	co.push(t.name+"="+t.value)
+	// })
+	// //let cookie = await page.evaluate(() => document.cookie);
+	// let cookie = (co.join(";"))
+	// //console.log("cookie :" + cookie);
+	// //browser.close();
+	// return cookie;
+}
+
+
+
 var Loader = {
 	get: get,
 	getJSON: getJSON,
@@ -150,7 +199,10 @@ var Loader = {
 	post: post,
 	postJSON: postJSON,
 	postDOM: postDOM,
-	parseHTML: parseHTML
+	parseHTML: parseHTML,
+	request:request,
+	getCookie:getCookie
 }
 
 module.exports = Loader;
+
