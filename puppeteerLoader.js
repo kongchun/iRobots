@@ -69,6 +69,7 @@ var getCookie =  async function(url,wait){
 
 var browserClose = function(url){
 	browser && browser.close();
+	console.log("browserClose");
 }
 
 var getOnce = async function(url,wait){
