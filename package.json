@@ -21,7 +21,7 @@
     "cheerio": "^0.22.0",
     "http": "^0.0.0",
     "iconv-lite": "^0.4.16",
-    "mongodb": "^2.2.31"
+    "mongodb": "^3.6.1"
   },
   "devDependencies": {}
 }
