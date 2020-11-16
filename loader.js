@@ -56,7 +56,7 @@ var requestBody = function({
 		encoding: null,
 		headers: header,
 		form: formData,
-		//proxy:"http://127.0.0.1:1086"
+		//proxy:"http://112.84.52.165:9999"
 	}
 
 	//console.log(options);
@@ -66,7 +66,7 @@ var requestBody = function({
 		request(options, function(error, response, body) {
 
 			if (!error && (response.statusCode == 200 || response.statusCode==202) ) {
-				console.log(body.toString())
+				//console.log(body.toString())
 				if (charset == null) {
 					charset = getCharset(body);
 				}

@@ -4,12 +4,15 @@ let browser =null;
 let page = null;
 
 async function  init(){
-	if(page==null){
+	if(page==null || browser ==null){
 		 browser = await puppeteer.launch({
+			ignoreDefaultArgs: ["--enable-automation"],
 			args: [
-				'--no-sandbox'
+				'--no-sandbox',
+				//'--proxy-server=http://180.118.128.70:9000'
 			],
-			executablePath: 'C:/Users/kongchun/AppData/Local/Google/Chrome/Application/chrome.exe',
+			executablePath: "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe",
+		
 			//ignoreHTTPSErrors: true,
 			//devtools: true,
 			headless: false
@@ -28,6 +31,12 @@ async function  init(){
 			Object.defineProperty(navigator, 'webdriver', {
 				get: () => false,
 			  });
+
+			//   await page.evaluateOnNewDocument(() => {
+			// 	const newProto = navigator.__proto__;
+			// 	delete newProto.webdriver;
+			// 	navigator.__proto__ = newProto;
+			//   });
 	
 			window.navigator.chrome = {
 				runtime: {},
@@ -69,6 +78,8 @@ var getCookie =  async function(url,wait){
 
 var browserClose = function(url){
 	browser && browser.close();
+	browser =null;
+	page = null;
 	console.log("browserClose");
 }
 
